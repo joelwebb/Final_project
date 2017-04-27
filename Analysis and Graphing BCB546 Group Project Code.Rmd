@@ -1,0 +1,145 @@
+---
+title: "Group Project Graphs"
+author: "Joe Webb and Ali Kirwen"
+date: "April 20, 2017"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+#Final Project: Data Analysis and Graphing
+
+
+
+##Data Formatting
+Additional packages used were ggpot2 and rmarkdown. The files producsed by the previously run bash script are all individually read into R and set as objects. They will be combined into full SNP and particpant data. 
+```{r}
+library(ggplot2)
+library(rmarkdown)
+```
+
+
+
+### The four SNPs of interest's files produced by the bash script are read into R and set as objects for future use 
+
+####SNP rs7153073
+```{r}
+temporal_sa_noheader <- read.table("SNP_rs7153703/Temporal_Surface_Area.txt", header= F)
+rs7153703MAP <- read.table("SNP_rs7153703/ADNI_snp_rs7153703.map", header= F)
+rs7153703Ped <- read.table("SNP_rs7153703/ADNI_snp_rs7153703.ped", header= F)
+rs7153703TEMPSAaq <- read.table("SNP_rs7153703/ADNI_rs7153703_Temp_SA_assoc.qassoc", header= F)
+```
+
+####SNP rs17123958
+```{r}
+temporal_sa_noheader <- read.table("SNP_rs17123958/Temporal_Surface_Area.txt", header= F)
+rs17123958Ped <- read.table("SNP_rs17123958/ADNI_snp_rs17123958.ped", header= F)
+rs17123958MAP <- read.table("SNP_rs17123958/ADNI_snp_rs17123958.map", header= F)
+rs17123958TEMPSAaq <- read.table("SNP_rs17123958/ADNI_rs17123958_Temp_SA_assoc.qassoc", header= F)
+```
+
+
+####SNP rs12885443
+```{r}
+temporal_sa_noheader <- read.table("SNP_rs12885443/Temporal_Surface_Area.txt", header= F)
+rs12885443Ped <- read.table("SNP_rs12885443/ADNI_snp_rs12885443.ped", header= F)
+rs12885443MAP <- read.table("SNP_rs12885443/ADNI_snp_rs12885443.map", header= F)
+rs12885443TEMPSAaq <- read.table("SNP_rs12885443/ADNI_rs12885443_Temp_SA_assoc.qassoc", header= F)
+```
+
+
+####SNP rs11626056
+```{r}
+temporal_sa_noheader <- read.table("SNP_rs11626056/Temporal_Surface_Area.txt", header= F)
+rs11626056Ped <- read.table("SNP_rs11626056/ADNI_snp_rs11626056.ped", header= F)
+rs11626056MAP <- read.table("SNP_rs11626056/ADNI_snp_rs11626056.map", header= F)
+rs11626056TEMPSAaq <- read.table("SNP_rs11626056/ADNI_rs11626056_Temp_SA_assoc.qassoc", header= F)
+```
+
+
+### .csv files are created to meld together entire SNP information to be used for future statistical analysis (GLMs)
+```{r}
+Full_SNP_rs116 <- read.csv("SNP_rs11626056/rs11626056 _Full_SNPs.csv", header= T)
+Full_SNP_rs128 <- read.csv("Snp_rs12885443/rs12885443_Full_SNPs.csv", header= T)
+Full_SNP_rs171 <- read.csv("Snp_rs17123958/rs17123958_Full_SNPs.csv", header= T)
+Full_SNP_rs715 <- read.csv("SNP_rs7153703/rs7153703_Full_SNPs.csv", header= T)
+```
+
+
+###All .ped files were combined together with Temporal surface files to create full genetic and demographic data for participants in the study. 
+```{r}
+Full_Ped <- read.csv("Full_Indivi_Gene_Data.csv", header = T)
+
+```
+
+
+##Data Analysis
+The authors showed that all four SNPs of interest were associated with brain atrophy (p < .05). To test this we used the Temporal Surface as a sign of brain atrophy. On its own, sex was insignificant while age (p < .001) and education (p < .001) were significant. However, when a model attempted to fit all three factors, the significance reversed (p < .001). This shows signs of colinearity, which was never discussed by the origional authors. 
+```{r}
+FitAgebySA <- glm(Full_Ped$Temporal.Surface.Area ~ Full_Ped$Age, data = Full_Ped)
+FitSexbySA <- glm(Full_Ped$Temporal.Surface.Area ~ Full_Ped$Sex, data = Full_Ped)
+FitEdubySA <- glm(Full_Ped$Temporal.Surface.Area ~ Full_Ped$Education, data = Full_Ped)
+FitWithAll <-glm(Full_Ped$Temporal.Surface.Area ~ Full_Ped$Sex + Full_Ped$Age + Full_Ped$Education, data= Full_Ped)
+```
+
+
+##Graphing
+Various aspects of the data set are graphed. Demographic data, followed my major and minor allele assessment, as well as information about the temporal surface areas. Ignore warnings about the deleted rows; these rows contain no data and are not actually used in any analysis. 
+
+### Sex demographic spread
+```{r Full_Ped, echo=TRUE}
+ggplot(Full_Ped) + geom_bar(aes(x=Full_Ped$Sex))+ labs(title = "Sex of Individual\n", x = "Number of Chromosomes", y = "Count") 
+```
+
+
+### Age demographic spread
+```{r FUll_Ped1, echo = TRUE}
+ggplot(Full_Ped) + geom_bar(aes(x=Full_Ped$Age))+ labs(title = "Age of Individual\n", x = "Age", y = "Count")
+```
+
+
+### Education demographic spread
+```{r FUll_Ped2, echo = TRUE}
+ggplot(Full_Ped) + geom_bar(aes(x=Full_Ped$Education))+ labs(title = "Years of Education per Individual\n", x = "Education Years", y = "Count")
+```
+
+### Temporal Surface demobraphic spread
+```{r FUll_Ped3, echo = TRUE}
+ggplot(Full_Ped) + geom_bar(aes(x=Full_Ped$Temporal.Surface.Area))+ labs(title = "Temporal Surface Area per Individual\n", x = "Temporal Surface", y = "Count")
+```
+
+### Age by temporal surface area
+```{r FUll_Ped4, echo = TRUE}
+ggplot(Full_Ped) + geom_point(aes(x = Full_Ped$Age, y = Full_Ped$Temporal.Surface.Area))+ labs(title = "Age by Temporal Surface Area\n", x = "Age", y = "Temporal Surface Area")
+```
+
+### Education by temporal surface area
+```{r FUll_Ped5, echo = FALSE}
+ggplot(Full_Ped) + geom_point(aes(x = Full_Ped$Education, y = Full_Ped$Temporal.Surface.Area))+ labs(title = "Education by Temporal Surface Area\n", x = "Education", y = "Temporal Surface Area")
+```
+
+
+### Major and minor allele assessments
+The authors did not specify which alleles were major and which were minor. This lead to us having to run these analyses to attempt to determine that for ourselves. 
+```{r FUll_Ped6, echo = TRUE}
+ggplot(Full_Ped) + geom_bar(aes(x = Full_Ped$rs715.1)) + labs(title = "Allele per Loci\n", x = "SNP rs7153703", y = "Count")
+ggplot(Full_Ped) + geom_bar(aes(x = Full_Ped$rs715.2)) + labs(title = "Allele per Loci\n", x = "SNP rs7153703", y = "Count")
+ggplot(Full_Ped) + geom_bar(aes(x = Full_Ped$rs116.1)) + labs(title = "Allele per Loci\n", x = "SNP rs11626056", y = "Count")
+ggplot(Full_Ped) + geom_bar(aes(x = Full_Ped$rs128.1)) + labs(title = "Allele per Loci\n", x = "SNP rs12885443", y = "Count")
+ggplot(Full_Ped) + geom_bar(aes(x = Full_Ped$rs128.2)) + labs(title = "Allele per Loci\n", x = "SNP rs12885443", y = "Count")
+ggplot(Full_Ped) + geom_bar(aes(x = Full_Ped$rs171.1)) + labs(title = "Allele per Loci\n", x = "SNP rs17123958", y = "Count")
+ggplot(Full_Ped) + geom_bar(aes(x = Full_Ped$rs171.2)) + labs(title = "Allele per Loci\n", x = "SNP rs17123958", y = "Count")
+```
+
+## Temproal surface area by alleles
+```{r FUll_Ped7, echo = FALSE}
+ggplot(Full_Ped) + geom_point(aes(x=Full_Ped$rs715.1, y=Full_Ped$Temporal.Surface.Area))
+ggplot(Full_Ped) + geom_point(aes(x=Full_Ped$rs715.2, y=Full_Ped$Temporal.Surface.Area))
+ggplot(Full_Ped) + geom_point(aes(x=Full_Ped$rs116.1, y=Full_Ped$Temporal.Surface.Area))
+ggplot(Full_Ped) + geom_point(aes(x=Full_Ped$rs128.1, y=Full_Ped$Temporal.Surface.Area))
+ggplot(Full_Ped) + geom_point(aes(x=Full_Ped$rs128.2, y=Full_Ped$Temporal.Surface.Area))
+ggplot(Full_Ped) + geom_point(aes(x=Full_Ped$rs171.1, y=Full_Ped$Temporal.Surface.Area))
+ggplot(Full_Ped) + geom_point(aes(x=Full_Ped$rs171.2, y=Full_Ped$Temporal.Surface.Area))
+```
