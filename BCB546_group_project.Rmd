@@ -10,12 +10,10 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 #Final Project: Data Analysis and Graphing
-R version 3.3.3 was used in this project
-
 
 
 ##Data Formatting
-Additional packages used were ggpot2 and rmarkdown. The files producsed by the previously run bash script are all individually read into R and set as objects. They will be combined into full SNP and particpant data. 
+R version 3.3.3 was used in this project. Additional packages used were ggpot2 and rmarkdown. The files producsed by the previously run bash script are all individually read into R and set as objects. They will be combined into full SNP and particpant data. 
 ```{r}
 library(ggplot2)
 library(rmarkdown)
