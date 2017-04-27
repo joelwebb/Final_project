@@ -10,6 +10,7 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 #Final Project: Data Analysis and Graphing
+R version 3.3.3 was used in this project
 
 
 
